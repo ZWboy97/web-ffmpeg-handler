@@ -9,4 +9,4 @@ app.use(bodyParser());
 app.use(apirouter.routes());
 
 app.listen(3000)
-console.log('[demo] start-quick is starting at port 3000')
+console.log('[web-ffmpeg-handler] is start at port 3000')

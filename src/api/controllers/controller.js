@@ -1,21 +1,16 @@
 const ffmpegHander = require('../../ffmpeghandler');
 
 class Controller {
-    async pull(ctx, next) {
+    async startStreamPush(ctx, next) {
         // 获取请求提交的数据
-        let name = ctx.request.body.name || '',
-            pwd = ctx.request.body.pwd || '';
-        console.log(ctx.request.body, pwd);
-
-        console.log('try to pull');
-        ffmpegHander.startPull();
-        console.log('success pull')
-
-
-        // do something
+        let pullStreamUrl = ctx.request.body.pull_stream_url || '',
+            pushStreamUrl = ctx.request.body.push_stream_url || '';
+        console.log(pullStreamUrl, pushStreamUrl);
+        console.log('try to pull stream and push');
+        let result = await ffmpegHander.startStreamPush(pullStreamUrl, pushStreamUrl);
         ctx.body = {
             status: true,
-            token: '123'
+            token: result
         }
     }
 }
