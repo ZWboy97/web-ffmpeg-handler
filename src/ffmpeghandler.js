@@ -17,6 +17,7 @@ class FFmpegHandler {
     async startStreamPush(pullStreamUrl, pushStreamUrl) {
         let hasProcess = inProcessHashMap.has(pushStreamUrl);
         if (hasProcess) {
+            console.log('与已有推流冲突了')
             return 'conflict'
         }
         let result = await this.startStreamPushComand(pullStreamUrl, pushStreamUrl)
@@ -29,12 +30,12 @@ class FFmpegHandler {
      * @param {*} pushStreamUrl 
      */
     startStreamPushComand(pullStreamUrl, pushStreamUrl) {
+        inProcessHashMap.set(pushStreamUrl, ffmpeg(pullStreamUrl));
         return new Promise((resolve, reject) => {
             try {
-                var command = ffmpeg(pullStreamUrl)
+                inProcessHashMap.get(pushStreamUrl)
                     .on('start', function (commandLine) {
                         console.log('启动文件推流，实际执行命令:' + commandLine);
-                        inProcessHashMap.set(pushStreamUrl, command);
                     })
                     .on('error', function (err, stdout, stderr) {
                         console.log('推流发生错误：', err.message);
@@ -61,6 +62,35 @@ class FFmpegHandler {
                 reject(err);
             }
         })
+    }
+
+    async stopStreamPush(pullStreamUrl, pushStreamUrl) {
+        let result = await this.stopStreamPushComand(pullStreamUrl, pushStreamUrl)
+        return result;
+    }
+
+    stopStreamPushComand(pullStreamUrl, pushStreamUrl) {
+        return new Promise((resolve, reject) => {
+            try {
+                let hasProcess = inProcessHashMap.has(pushStreamUrl);
+                if (hasProcess) {
+                    var command = inProcessHashMap.get(pushStreamUrl);
+                    command.on('error', function (err, stdout, stderr) {
+                        console.log('停止推流：', err.message);
+                        inProcessHashMap.remove(pushStreamUrl);
+                        resolve('success');
+                    })
+                        .renice(-10); //提高优先级
+                    command.kill('SIGKILL');
+                } else {
+                    console.log('该流不存在')
+                    resolve('noexist');
+                }
+            } catch (err) {
+                reject(err);
+            }
+        })
+
     }
 
 
