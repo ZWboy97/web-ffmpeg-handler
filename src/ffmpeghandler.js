@@ -1,4 +1,6 @@
 const ffmpeg = require('fluent-ffmpeg');
+const HashMap = require('hashmap');
+let inProcessHashMap = new HashMap();
 
 class FFmpegHandler {
 
@@ -6,12 +8,17 @@ class FFmpegHandler {
         console.log('新建 ffmpeg handler');
     }
 
+
     /**
      * 拉流直播Handler
      * @param {*} pullStreamUrl 
      * @param {*} pushStreamUrl 
      */
     async startStreamPush(pullStreamUrl, pushStreamUrl) {
+        let hasProcess = inProcessHashMap.has(pushStreamUrl);
+        if (hasProcess) {
+            return 'conflict'
+        }
         let result = await this.startStreamPushComand(pullStreamUrl, pushStreamUrl)
         return result;
     }
@@ -27,17 +34,20 @@ class FFmpegHandler {
                 var command = ffmpeg(pullStreamUrl)
                     .on('start', function (commandLine) {
                         console.log('启动文件推流，实际执行命令:' + commandLine);
-                        resolve('success');
+                        inProcessHashMap.set(pushStreamUrl, command);
                     })
                     .on('error', function (err, stdout, stderr) {
                         console.log('推流发生错误：', err.message);
+                        inProcessHashMap.remove(pushStreamUrl);
                         resolve('error');
                     })
                     .on('progress', function (progress) {
                         console.log('推流中，进度:' + progress.percent + '% 已完成');
+                        resolve('success');
                     })
                     .on('end', function () {
                         console.log('推流处理结束');
+                        inProcessHashMap.remove(pushStreamUrl);
                     })
                     .inputOptions([
                     ])

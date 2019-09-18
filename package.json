@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
+    "hashmap": "^2.3.0",
     "koa": "^2.8.1",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
