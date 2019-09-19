@@ -90,7 +90,17 @@ class FFmpegHandler {
                 reject(err);
             }
         })
+    }
 
+    async getStreamPushStatus(pushStreamUrl) {
+        let hasProcess = inProcessHashMap.has(pushStreamUrl);
+        if (hasProcess) {
+            console.log('查询状态：推流中')
+            return 'active';
+        } else {
+            console.log('查询状态：未推流')
+            return 'inactive';
+        }
     }
 
 

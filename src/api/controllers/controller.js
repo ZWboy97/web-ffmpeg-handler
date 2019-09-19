@@ -25,6 +25,16 @@ class Controller {
             result: result
         }
     }
+
+    async getStreamPushStatus(ctx, next) {
+        let pushStreamUrl = ctx.request.body.push_stream_url || '';
+        console.log('接收到查询拉流直播状态的请求');
+        console.log('try to get pull and push status');
+        let result = await ffmpegHander.getStreamPushStatus(pushStreamUrl);
+        ctx.body = {
+            result: result
+        }
+    }
 }
 
 module.exports = new Controller();
