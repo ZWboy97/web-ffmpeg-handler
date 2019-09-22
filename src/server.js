@@ -6,9 +6,9 @@ const cors = require('./middleware/cors');
 
 const app = new Koa();
 
+app.use(cors);
 app.use(bodyParser());
 app.use(apirouter.routes());
-app.use(cors);
 
 app.listen(3000)
 console.log('[web-ffmpeg-handler] is start at port 3000')

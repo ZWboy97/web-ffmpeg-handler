@@ -10,7 +10,7 @@ class Controller {
         console.log('推流地址', pushStreamUrl);
         console.log('try to pull stream and push');
         let result = await ffmpegHander.startStreamPush(pullStreamUrl, pushStreamUrl);
-        ctx.body = {
+        ctx.response.body = {
             result: result
         }
     }
